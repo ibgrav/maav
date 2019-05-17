@@ -1,3 +1,5 @@
+var infoRef = firebase.storage().ref().child('data.txt');
+
 var app = new Vue({
     el: '#app',
     data: {
@@ -11,15 +13,15 @@ var app = new Vue({
         selectedResource: '',
         selectedInfo: [],
         resourceHeads: [{
-            "text": "Title", "value":"title"
+            "text": "Title", "value": "title"
         }, {
-            "text": "Phone", "value":"phone"
+            "text": "Phone", "value": "phone"
         }, {
-            "text": "TTY", "value":"tty"
+            "text": "TTY", "value": "tty"
         }, {
-            "text": "Website", "value":"web"
+            "text": "Website", "value": "web"
         }, {
-            "text": "Blurb", "value":"blurb"
+            "text": "Blurb", "value": "blurb"
         }],
         info: [{
             "title": "Emergency",
@@ -189,7 +191,7 @@ var app = new Vue({
     },
     updated: function () {
         this.$nextTick(function () {
-            this.loading = false;
+            // this.loading = false;
         })
     },
     methods: {
@@ -203,18 +205,45 @@ var app = new Vue({
         },
         chooseResource: (event) => {
             app.selectedResource = event;
-            for(item of app.info) {
-                if(item.title == event) app.selectedInfo = item.data;
+            for (item of app.info) {
+                if (item.title == event) app.selectedInfo = item.data;
             }
         },
         editItem: (event) => {
             console.log(event);
+        },
+        updateStorage: async () => {
+            app.loading = true;
+            var blob = new Blob([JSON.stringify(app.info)], { type: 'text' });
+            var time = new Date();
+            var timestamp = (time.toLocaleDateString() + ' ' + time.toLocaleTimeString()).replace(/\//g, '-');
+            var backupRef = firebase.storage().ref().child(timestamp + '.txt');
+            await infoRef.put(blob).then(function (snapshot) {
+                console.log('Uploaded ', app.info);
+            });
+            await backupRef.put(blob).then(function (snapshot) {
+                console.log('Uploaded ' + timestamp);
+            });
+            app.loading = false;
         }
     }
 });
 
-firebase.auth().onAuthStateChanged(function (user) {
-    if (user) app.authenticated = true;
+firebase.auth().onAuthStateChanged(async function (user) {
+    app.loading = true;
+    if (user) {
+        var fetchurl = '';
+        app.authenticated = true;
+        await infoRef.getDownloadURL().then(function (url) {
+            fetchurl = url;
+        });
+        console.log(fetchurl)
+        await fetch(fetchurl).then(res => res.json())
+            .then((data) => {
+                console.log(data);
+            });
+    }
     else app.authenticated = false;
+
     app.loading = false;
 });
