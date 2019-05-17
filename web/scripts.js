@@ -206,6 +206,9 @@ var app = new Vue({
             for(item of app.info) {
                 if(item.title == event) app.selectedInfo = item.data;
             }
+        },
+        editItem: (event) => {
+            console.log(event);
         }
     }
 });

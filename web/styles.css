@@ -2,6 +2,13 @@
     display: none;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active  {
+    -webkit-box-shadow: 0 0 0 30px #d6c4a2 inset !important;
+}
+
 body {
     margin: 0;
     background-color: #d6c4a2;
@@ -10,7 +17,7 @@ body {
 }
 
 #app {
-    max-width: 900px;
+    max-width: 1400px;
     padding: 10px;
     margin: auto;
 }
@@ -67,6 +74,14 @@ body {
 
 #app.in .auth-box {
     display: none;
+}
+
+.table {
+    display: none;
+}
+
+#app.in .table {
+    display: block;
 }
 
 

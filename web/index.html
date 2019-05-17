@@ -43,29 +43,45 @@
             <v-text-field id="pass" value="" label="password" type="password" outline></v-text-field>
             <div class="auth" @click="auth()">login</div>
         </div>
-       
-        <v-card>
-            <v-card-title>
-                <v-select v-on:change="chooseResource" :items="resources" label="Resource" single-line hide-details></v-select>
-                <v-spacer></v-spacer>
-                <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details>
-                </v-text-field>
-            </v-card-title>
-            <v-data-table :headers="resourceHeads" :items="selectedInfo" :search="search" :rows-per-page-items="[-1]" dark>
-                <template v-slot:items="props">
-                    <td>{{ props.item.title }}</td>
-                    <td>{{ props.item.phone }}</td>
-                    <td>{{ props.item.tty }}</td>
-                    <td>{{ props.item.web }}</td>
-                    <td>{{ props.item.blurb }}</td>
-                </template>
-                <template v-slot:no-results>
-                    <v-alert :value="true" color="error" icon="warning">
-                        Your search for "{{ search }}" found no results.
-                    </v-alert>
-                </template>
-            </v-data-table>
-        </v-card>
+
+        <div class="table">
+            <v-card>
+                <v-card-title>
+                    <v-select v-on:change="chooseResource" :items="resources" label="Resource" single-line hide-details>
+                    </v-select>
+                    <v-spacer></v-spacer>
+                    <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details>
+                    </v-text-field>
+                    <v-spacer></v-spacer>
+                    <v-btn dark>Save</v-btn>
+                </v-card-title>
+                <v-data-table :headers="resourceHeads" :items="selectedInfo" :search="search"
+                    :rows-per-page-items="[-1]" dark>
+                    <template v-slot:items="props">
+                        <td>
+                            <v-textarea :rows="2" :value="props.item.title"></v-textarea>
+                        </td>
+                        <td>
+                            <v-textarea :rows="2" :value="props.item.phone"></v-textarea>
+                        </td>
+                        <td>
+                            <v-textarea :rows="2" :value="props.item.tty"></v-textarea>
+                        </td>
+                        <td>
+                            <v-textarea :rows="2" :value="props.item.web"></v-textarea>
+                        </td>
+                        <td>
+                            <v-textarea :rows="2" :value="props.item.blurb"></v-textarea>
+                        </td>
+                    </template>
+                    <template v-slot:no-results>
+                        <v-alert :value="true" color="error" icon="warning">
+                            Your search for "{{ search }}" found no results.
+                        </v-alert>
+                    </template>
+                </v-data-table>
+            </v-card>
+        </div>
     </div>
 
     <script src="scripts.js"></script>
