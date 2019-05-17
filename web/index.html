@@ -60,19 +60,19 @@
                     :rows-per-page-items="[-1]" dark>
                     <template v-slot:items="props">
                         <td>
-                            <v-textarea :rows="2" :value="props.item.title"></v-textarea>
+                            <v-textarea :rows="2" :value="props.item.title" @input="saveInput($event, 'title', props.item.id)"></v-textarea>
                         </td>
                         <td>
-                            <v-textarea :rows="2" :value="props.item.phone"></v-textarea>
+                            <v-textarea :rows="2" :value="props.item.phone" @input="saveInput($event, 'phone', props.item.id)"></v-textarea>
                         </td>
                         <td>
-                            <v-textarea :rows="2" :value="props.item.tty"></v-textarea>
+                            <v-textarea :rows="2" :value="props.item.tty" @input="saveInput($event, 'tty', props.item.id)"></v-textarea>
                         </td>
                         <td>
-                            <v-textarea :rows="2" :value="props.item.web"></v-textarea>
+                            <v-textarea :rows="2" :value="props.item.web" @input="saveInput($event, 'web', props.item.id)"></v-textarea>
                         </td>
                         <td>
-                            <v-textarea :rows="2" :value="props.item.blurb"></v-textarea>
+                            <v-textarea :rows="2" :value="props.item.blurb" @input="saveInput($event, 'blurb', props.item.id)"></v-textarea>
                         </td>
                     </template>
                     <template v-slot:no-results>
