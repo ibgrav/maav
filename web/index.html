@@ -1,8 +1,51 @@
 <html>
-    <head>
-        <title>MAAV APP EDIT</title>
-    </head>
-    <body>
-        MAAV
-    </body>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta charset="utf-8" />
+
+    <title>MAAV</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.1/firebase-auth.js"></script>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyAY9unVcdg9OpvbVrHh-ZfqPo19O0ti_rw",
+            authDomain: "maav-b9475.firebaseapp.com",
+            databaseURL: "https://maav-b9475.firebaseio.com",
+            projectId: "maav-b9475",
+            storageBucket: "maav-b9475.appspot.com",
+            messagingSenderId: "144721360922",
+            appId: "1:144721360922:web:f34cd6c33231aa5c"
+        };
+        firebase.initializeApp(firebaseConfig);
+    </script>
+</head>
+
+<body>
+    <div id="app" v-cloak v-bind:class="{ in: authenticated }">
+        <div class="loading" v-bind:class="{ show: loading }">
+            <div class="lds-ellipsis">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+        <div class="auth-box" v-bind:class="{ passError: passError }">
+            <v-text-field id="pass" value="" label="password" type="password" outline></v-text-field>
+            <div class="auth" @click="auth()">login</div>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+
 </html>
