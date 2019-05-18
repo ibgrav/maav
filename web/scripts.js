@@ -1,4 +1,5 @@
-var infoRef = firebase.storage().ref().child('data.txt');
+var stagingRef = firebase.storage().ref().child('staging.json');
+var masterRef = firebase.storage().ref().child('master.json');
 
 var app = new Vue({
     el: '#app',
@@ -8,9 +9,12 @@ var app = new Vue({
         alert: true,
         passError: false,
         authenticated: false,
+        dialog: false,
+        editEntry: false,
         search: null,
         resources: [],
         selectedResource: '',
+        selectedIndex: null,
         selectedInfo: [],
         resourceHeads: [{
             "text": "Title", "value": "title"
@@ -23,7 +27,22 @@ var app = new Vue({
         }, {
             "text": "Blurb", "value": "blurb"
         }],
-        info: []
+        info: [],
+        newResource: {
+            "title": "",
+            "phone": "",
+            "tty": "",
+            "web": "",
+            "blurb": ""
+        },
+        editResource: {
+            "id":"",
+            "title": "",
+            "phone": "",
+            "tty": "",
+            "web": "",
+            "blurb": ""
+        }
     },
     updated: function () {
         this.$nextTick(function () {
@@ -42,6 +61,7 @@ var app = new Vue({
         chooseResource: (event) => {
             app.selectedResource = event;
             let a = app.info.findIndex(obj => obj.title == event);
+            app.selectedIndex = a;
             app.selectedInfo = app.info[a].data;
         },
         editItem: (event) => {
@@ -52,8 +72,8 @@ var app = new Vue({
             var blob = new Blob([JSON.stringify(app.info)], { type: 'text' });
             var time = new Date();
             var timestamp = (time.toLocaleDateString() + ' ' + time.toLocaleTimeString()).replace(/\//g, '-');
-            var backupRef = firebase.storage().ref().child(timestamp + '.txt');
-            await infoRef.put(blob).then(function (snapshot) {
+            var backupRef = firebase.storage().ref().child('/backup').child(timestamp + '.json');
+            await stagingRef.put(blob).then(function (snapshot) {
                 console.log('Uploaded ', app.info);
             });
             await backupRef.put(blob).then(function (snapshot) {
@@ -67,11 +87,47 @@ var app = new Vue({
             }
         },
         saveInput: (event, type, item) => {
-            console.log(event, ' ', app.selectedResource, ' ', type, ' ', item);
+            // let a = app.info.findIndex(obj => obj.title == app.selectedResource);
+            let b = app.info[app.selectedIndex].data.findIndex(obj => obj.id == item);
+            app.info[app.selectedIndex].data[b][type] = event;
+            console.log(JSON.stringify(app.info[app.selectedIndex].data[b]));
+        },
+        addCategory: () => {
 
-            let a = app.info.findIndex(obj => obj.title == app.selectedResource);
-            let b = app.info[a].data.findIndex(obj => obj.id == item);
-            app.info[a].data[b][type] = event;
+        },
+        addResource: () => {
+            // let a = app.info.findIndex(obj => obj.title == app.selectedResource);
+            app.newResource.id = app.info[app.selectedIndex].data.length;
+            app.info[app.selectedIndex].data.push(app.newResource);
+            app.resetNewResource();
+            app.dialog = false;
+            console.log(app.info[app.selectedIndex]);
+        },
+        resetNewResource: () => {
+            app.newResource = {
+                "id":"",
+                "title": "",
+                "phone": "",
+                "tty": "",
+                "web": "",
+                "blurb": ""
+            }
+            app.editResource = {
+                "id":"",
+                "title": "",
+                "phone": "",
+                "tty": "",
+                "web": "",
+                "blurb": ""
+            }
+        },
+        editCurrentEntry: (id) => {
+            let a = app.info[app.selectedIndex].data.findIndex(obj => obj.id == id);
+            app.editResource = app.info[app.selectedIndex].data[a];
+            app.editEntry = true;
+        },
+        deleteEntry: () => {
+            
         }
     }
 });
@@ -81,7 +137,7 @@ firebase.auth().onAuthStateChanged(async function (user) {
     if (user) {
         var fetchurl = '';
         app.authenticated = true;
-        await infoRef.getDownloadURL().then(function (url) {
+        await stagingRef.getDownloadURL().then(function (url) {
             fetchurl = url;
         });
         console.log(fetchurl)

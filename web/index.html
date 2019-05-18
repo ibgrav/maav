@@ -54,25 +54,85 @@
                     <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details>
                     </v-text-field>
                     <v-spacer></v-spacer>
+                    <v-layout row justify-center>
+                        <v-dialog v-model="dialog" persistent max-width="600px">
+                            <template v-slot:activator="{ on }">
+                                <v-btn color="primary" dark v-on="on">Add New Entry</v-btn>
+                            </template>
+                            <v-card>
+                                <v-card-title centered>
+                                    <span class="headline">Add New Entry</span>
+                                </v-card-title>
+                                <v-card-text>
+                                    <v-container grid-list-md>
+                                        <v-layout wrap>
+                                            <v-flex xs12 sm12>
+                                                <v-textarea v-model="newResource.title" :rows="2" label="Title">
+                                                </v-textarea>
+                                            </v-flex>
+                                        </v-layout>
+                                        <v-layout wrap>
+                                            <v-flex xs12 sm12>
+                                                <v-textarea v-model="newResource.phone" :rows="2" label="Phone">
+                                                </v-textarea>
+                                            </v-flex>
+                                        </v-layout>
+                                        <v-layout wrap>
+                                            <v-flex xs12 sm12>
+                                                <v-textarea v-model="newResource.tty" :rows="2" label="TTY">
+                                                </v-textarea>
+                                            </v-flex>
+                                        </v-layout>
+                                        <v-layout wrap>
+                                            <v-flex xs12 sm12>
+                                                <v-textarea v-model="newResource.web" :rows="2" label="Website">
+                                                </v-textarea>
+                                            </v-flex>
+                                        </v-layout>
+                                        <v-layout wrap>
+                                            <v-flex xs12 sm12>
+                                                <v-textarea v-model="newResource.blurb" :rows="2" label="Blurb">
+                                                </v-textarea>
+                                            </v-flex>
+                                        </v-layout>
+                                    </v-container>
+                                </v-card-text>
+                                <v-card-actions>
+                                    <v-spacer></v-spacer>
+                                    <v-btn color="blue darken-1" flat @click="dialog = false; resetNewResource()">Close
+                                    </v-btn>
+                                    <v-btn color="blue darken-1" flat @click="addResource">Save</v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </v-dialog>
+                    </v-layout>
+                    <v-spacer></v-spacer>
+                    <v-btn dark @click="addResource">Add Resource</v-btn>
+                    <v-spacer></v-spacer>
                     <v-btn dark @click="updateStorage">Save</v-btn>
                 </v-card-title>
                 <v-data-table :headers="resourceHeads" :items="selectedInfo" :search="search"
                     :rows-per-page-items="[-1]" dark>
                     <template v-slot:items="props">
-                        <td>
-                            <v-textarea :rows="2" :value="props.item.title" @input="saveInput($event, 'title', props.item.id)"></v-textarea>
+                        <td @click="editCurrentEntry(props.item.id)">{{ props.item.title }}
+                            <!-- <v-textarea :rows="2" :value="props.item.title"
+                                @input="saveInput($event, 'title', props.item.id)"></v-textarea> -->
                         </td>
-                        <td>
-                            <v-textarea :rows="2" :value="props.item.phone" @input="saveInput($event, 'phone', props.item.id)"></v-textarea>
+                        <td @click="editCurrentEntry(props.item.id)">{{ props.item.phone }}
+                            <!-- <v-textarea :rows="2" :value="props.item.phone"
+                                @input="saveInput($event, 'phone', props.item.id)"></v-textarea> -->
                         </td>
-                        <td>
-                            <v-textarea :rows="2" :value="props.item.tty" @input="saveInput($event, 'tty', props.item.id)"></v-textarea>
+                        <td @click="editCurrentEntry(props.item.id)">{{ props.item.tty }}
+                            <!-- <v-textarea :rows="2" :value="props.item.tty"
+                                @input="saveInput($event, 'tty', props.item.id)"></v-textarea> -->
                         </td>
-                        <td>
-                            <v-textarea :rows="2" :value="props.item.web" @input="saveInput($event, 'web', props.item.id)"></v-textarea>
+                        <td @click="editCurrentEntry(props.item.id)">{{ props.item.web }}
+                            <!-- <v-textarea :rows="2" :value="props.item.web"
+                                @input="saveInput($event, 'web', props.item.id)"></v-textarea> -->
                         </td>
-                        <td>
-                            <v-textarea :rows="2" :value="props.item.blurb" @input="saveInput($event, 'blurb', props.item.id)"></v-textarea>
+                        <td @click="editCurrentEntry(props.item.id)">{{ props.item.blurb }}
+                            <!-- <v-textarea :rows="2" :value="props.item.blurb"
+                                @input="saveInput($event, 'blurb', props.item.id)"></v-textarea> -->
                         </td>
                     </template>
                     <template v-slot:no-results>
@@ -82,6 +142,50 @@
                     </template>
                 </v-data-table>
             </v-card>
+            <v-layout row justify-center>
+                <v-dialog v-model="editEntry" persistent max-width="600px">
+                    <v-card>
+                        <v-card-title centered>
+                            <span class="headline">Edit Entry</span>
+                        </v-card-title>
+                        <v-card-text>
+                            <v-container grid-list-md>
+                                <v-layout wrap>
+                                    <v-flex xs12 sm12>
+                                        <v-textarea v-model="editResource.title" :rows="2" label="Title"></v-textarea>
+                                    </v-flex>
+                                </v-layout>
+                                <v-layout wrap>
+                                    <v-flex xs12 sm12>
+                                        <v-textarea v-model="editResource.phone" :rows="2" label="Phone"></v-textarea>
+                                    </v-flex>
+                                </v-layout>
+                                <v-layout wrap>
+                                    <v-flex xs12 sm12>
+                                        <v-textarea v-model="editResource.tty" :rows="2" label="TTY"></v-textarea>
+                                    </v-flex>
+                                </v-layout>
+                                <v-layout wrap>
+                                    <v-flex xs12 sm12>
+                                        <v-textarea v-model="editResource.web" :rows="2" label="Website"></v-textarea>
+                                    </v-flex>
+                                </v-layout>
+                                <v-layout wrap>
+                                    <v-flex xs12 sm12>
+                                        <v-textarea v-model="editResource.blurb" :rows="2" label="Blurb"></v-textarea>
+                                    </v-flex>
+                                </v-layout>
+                            </v-container>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-btn color="red darken-1" @click="deleteEntry">DELETE</v-btn>
+                            <v-spacer></v-spacer>
+                            <v-btn color="blue darken-1" flat @click="editEntry = false">Close</v-btn>
+                            <v-btn color="blue darken-1" flat @click="editResource">Save</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+            </v-layout>
         </div>
     </div>
 
