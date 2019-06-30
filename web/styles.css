@@ -25,7 +25,7 @@ textarea:hover, textarea:focus, textarea:active, textarea:focus-within {
     background-color: #eee;
 }
 #main {
-    margin: auto;
+    margin: auto auto 100px auto;
     width: calc(100% - 40px);
     padding: 20px 0;
 }
@@ -43,6 +43,19 @@ textarea:hover, textarea:focus, textarea:active, textarea:focus-within {
 }
 .row input {
     width: 25%;
+}
+.btn {
+    padding: 10px 20px;
+    float: right;
+    background-color: #444;
+    color: white;
+    border-radius: 5px;
+    margin: 20px 20px;
+}
+.btn:hover {
+    cursor: pointer;
+    background-color: white;
+    color: #444;
 }
 
 
