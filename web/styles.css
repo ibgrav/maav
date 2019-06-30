@@ -1,88 +1,45 @@
-[v-cloak] {
-    display: none;
-}
-
-input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
-input:-webkit-autofill:active  {
-    -webkit-box-shadow: 0 0 0 30px #d6c4a2 inset !important;
-}
-
 body {
     margin: 0;
-    background-color: #d6c4a2;
-    color: rgba(0, 0, 0, .54);
-    font-family: 'Fira Sans', sans-serif;
+    background-color: #41967a;
+    color: white;
+    font-family: 'Montserrat', sans-serif !important;
 }
-
-#app {
-    max-width: 1400px;
-    padding: 10px;
+input {
+    font-family: 'Montserrat', sans-serif !important;
+    padding: 5px 10px;
+    font-size: 16px;
+    border: none;
+    background-color: rgba(0,0,0,0);
+    color: white;
+}
+input::-webkit-input-placeholder, input:-ms-input-placeholder, input::placeholder, input::-moz-placeholder {
+    color: #cccccc !important;
+}
+#main {
     margin: auto;
+    width: calc(100% - 40px);
+    padding: 20px 0;
+}
+.table-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.set {
+    padding: 20px;
+}
+.row {
+    display: flex;
+    flex-flow: row;
+}
+.row input {
+    width: 25%;
 }
 
-.loading.show {
-    display: block;
-}
 
-.loading {
-    display: none;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    background-color: #d6c4a2;
-    z-index: 1000;
-    top: 0;
-    left: 0;
-}
 
-.loading div {
-    position: absolute;
-    top: calc(50% - 32px);
-}
 
-.auth:hover {
-    background-color: #eee;
-    color: rgb(0, 0, 0);
-    cursor: pointer;
-}
 
-.auth {
-    border-radius: 5px;
-    padding: 10px 20px;
-    margin: auto;
-    text-align: center;
-    font-size: 30px;
-    max-width: 150px;
-    transition: background-color 250ms, color 250ms linear;
-}
 
-.auth-box {
-    margin: 30px auto;
-    position: absolute;
-    width: 300px;
-    height: 150px;
-    left: calc(50% - 150px);
-    top: calc(50% - 150px);
-}
-
-.auth-box.passError .v-input__slot {
-    border: 2px solid rgb(170, 27, 27);
-}
-
-#app.in .auth-box {
-    display: none;
-}
-
-.table {
-    display: none;
-}
-
-#app.in .table {
-    display: block;
-}
 
 
 
