@@ -61,14 +61,14 @@ textarea:focus-within {
     max-width: 1200px;
 }
 
-.table-title {
+.table-title, .backup-main-title {
     font-weight: bold;
     font-size: 20px;
     margin-bottom: 10px;
 }
 
 .set {
-    padding: 20px;
+    padding: 20px 0;
     position: relative;
 }
 
@@ -85,7 +85,7 @@ textarea:focus-within {
 .add-row {
     font-weight: bold;
     position: absolute;
-    right: 20px;
+    right: 0;
     top: 25px;
     font-size: 30px;
     width: 40px;
@@ -108,7 +108,7 @@ textarea:focus-within {
     cursor: pointer;
 }
 
-.btn {
+.btn, .backup-btn {
     padding: 10px 20px;
     float: right;
     background-color: #444;
@@ -117,7 +117,7 @@ textarea:focus-within {
     margin: 20px 20px;
 }
 
-.btn:hover {
+.btn:hover, .backup-btn:hover {
     cursor: pointer;
     background-color: white;
     color: #444;
@@ -133,6 +133,29 @@ textarea:focus-within {
     padding: 10px;
 }
 
+.backup-box {
+    margin-top: 100px;
+}
+
+.backup {
+    margin-top: 20px;
+    border-bottom: 1px solid #999;
+}
+
+.backup-main-title {
+    margin-bottom: 40px;
+}
+
+.backup-btn {
+    display: inline-block;
+    float: none;
+}
+
+.backup-title {
+    margin-left: 20px;
+    font-weight: bold;
+}
+
 .add-row, .delete-row {
     -webkit-touch-callout: none;
       -webkit-user-select: none;
@@ -142,6 +165,18 @@ textarea:focus-within {
               user-select: none;
 }
 
+@media screen and (max-width: 1200px){
+    .row {
+        flex-flow: column;
+    }
+    .delete-row {
+        position: absolute;
+        right: 0;
+    }
+    .add-row {
+        right: 15px;
+    }
+}
 
 
 

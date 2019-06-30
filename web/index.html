@@ -36,32 +36,47 @@
         <div id="main"></div>
 
         <script>
+            var backupFolder = firebase.storage().ref('backup');
             var stagingRef = firebase.storage().ref().child('staging.json');
             var masterRef = firebase.storage().ref().child('master.json');
-
-            var mainData = {};
+            var backups = [], mainData = {}, resetData = {};
 
             if(!firebase.auth().currentUser) firebase.auth().signInWithEmailAndPassword('ibgrav@gmail.com', 'MAAV2019!').catch(function (error) {
                 console.log(error);
             });
 
             firebase.auth().onAuthStateChanged(async function (user) {
-                if (user) await getStaging();
+                if (user) {
+                    await getStaging();
+                    await getBackups();
+                    document.body.classList.remove('loading');
+                }
             });
+
+            async function getBackups(){
+                await backupFolder.listAll().then(function(result) {
+                    result.items.forEach(function(docRef) {
+                        backups.push(docRef.name.substr(0, docRef.name.indexOf('.json')));
+                    });
+                    backups.sort((a,b) => new Date(b) - new Date(a));
+                    console.log(backups);
+                    buildBackups();
+                }).catch((err) => displayMsg(err));
+            }
 
             async function getStaging(){
                 var fetchurl = '';
                 await stagingRef.getDownloadURL().then(function (url) {
                     fetchurl = url;
-                });
-                console.log(fetchurl);
+                }).catch((err) => displayMsg(err));
 
                 await fetch(fetchurl).then(res => res.json())
                     .then((data) => {
                         console.log(data);
                         mainData = data;
+                        resetData = data;
                         buildMain();
-                    });
+                    }).catch((err) => displayMsg(err));
             }
 
             async function updateStorage() {
@@ -77,16 +92,17 @@
                 });
                 await backupRef.put(blob).then(function (snapshot) {
                     console.log('Uploaded ' + timestamp);
+                    displayMsg('Saved Successfully');
                 });
                 
-                displayMsg('Saved Successfully!');
                 document.body.classList.remove('loading');
             }
 
-            function buildMain() {
+            function buildMain(resetCheck) {
                 let htmlString = '';
-                for(item of mainData) {
-                    htmlString += `<div class="set"><textarea cols="30" rows="1" type="text" class="table-title" placeholder="Section Title" data-type="title" style="resize:none;">${item.title}</textarea>
+                let data = resetCheck ? resetData : mainData;
+                for(item of data) {
+                    htmlString += `<div class="set"><textarea rows="1" class="table-title" placeholder="Section Title" data-type="title" style="resize:none;">${item.title}</textarea>
                                     <div class="add-row" onclick="addRow(this)">+</div>`;
                     for(one of item.data) {
                         htmlString += `<div class="row">
@@ -94,22 +110,40 @@
                                                 <div class="move-up" onclick="moveUp(this.parentElement.parentElement)"><i class="arrow up"></i></div>
                                                 <div class="move-down" onclick="moveDown(this.parentElement.parentElement)"><i class="arrow down"></i></div>
                                             </div>
-                                            <textarea cols="50" rows="2" placeholder="Title" data-type="title">${one.title || ''}</textarea>
-                                            <textarea cols="30" rows="2" type="text" placeholder="Phone" data-type="phone">${one.phone || ''}</textarea>
-                                            <textarea cols="30" rows="2" type="text" placeholder="TTY" data-type="tty">${one.tty || ''}</textarea>
-                                            <textarea cols="30" rows="2" type="text" placeholder="Website" data-type="website">${one.website || ''}</textarea>
-                                            <textarea cols="50" rows="2" type="text" placeholder="Blurb" data-type="blurb">${one.blurb || ''}</textarea>
+                                            <textarea rows="2" placeholder="Title" data-type="title">${one.title || ''}</textarea>
+                                            <textarea rows="2" placeholder="Phone" data-type="phone">${one.phone || ''}</textarea>
+                                            <textarea rows="2" placeholder="TTY" data-type="tty">${one.tty || ''}</textarea>
+                                            <textarea rows="2" placeholder="Website" data-type="website">${one.website || ''}</textarea>
+                                            <textarea rows="2" placeholder="Blurb" data-type="blurb">${one.blurb || ''}</textarea>
                                             <div class="delete-row" onclick="deleteRow(this.parentElement)">-</div>
                                         </div>`;
                     }
                     htmlString += `</div>`;
                 }
 
-                htmlString += `<div id="save" class="btn" onclick="return buildJson()">Save</div>
-                                <div id="reset" class="btn" onclick="return buildMain()">Reset</div>`;
+                htmlString += `<div id="save" class="btn" onclick="buildJson()">Save</div>
+                                <div id="reset" class="btn" onclick="reset()">Reset</div>`;
 
                 main.innerHTML = htmlString;
-                document.body.classList.remove('loading');
+            }
+
+            function buildBackups(){
+                let htmlString = '<div class="backup-box"><div class="backup-main-title">Data Backups</div>';
+
+                for(backup of backups){
+                    let title = new Date(backup);
+                    let date = (title.getMonth()+1) +'-'+ title.getDate() +'-'+ title.getFullYear();
+                    let time = title.getHours() + `:${title.getMinutes() < 10 ? '0' : ''}` + title.getMinutes();
+
+                    htmlString += `<div class="backup" data-backup="${backup}" data-index="${backups.indexOf(backup)}">
+                                        <div class="backup-title">${date+' '+time}</div>
+                                        <div class="backup-btn" onclick="backupRestore(this.parentElement)">Restore</div>
+                                        <div class="backup-btn" onclick="backupDelete(this.parentElement)">Delete</div>
+                                    </div>`;
+                }
+                htmlString += '</div>';
+
+                main.innerHTML += htmlString;
             }
 
             function buildJson(){
@@ -138,17 +172,54 @@
                 updateStorage();
             }
 
+            async function backupRestore(backupParent){
+                document.body.classList.add('loading');
+
+                let title = backupParent.dataset.backup + '.json';
+                let restoreRef = firebase.storage().ref('backup').child(title);
+
+                await restoreRef.getDownloadURL().then(function (url) {
+                    fetchurl = url;
+                }).catch((err) => displayMsg(err));
+
+                await fetch(fetchurl).then(res => res.json())
+                    .then((data) => {
+                        console.log(data);
+                        mainData = data;
+                        buildMain();
+                        buildBackups();
+                        displayMsg('Restored Successfully');
+                    }).catch((err) => (err) => displayMsg(err));
+                
+                document.body.classList.remove('loading');
+            }
+
+            async function backupDelete(backupParent){
+                document.body.classList.add('loading');
+
+                let title = backupParent.dataset.backup + '.json';
+                let deleteRef = firebase.storage().ref('backup').child(title);
+
+                await deleteRef.delete().then(() => {
+                    displayMsg('Deleted Successfully');
+                    if(backups.length > 0) backups.splice(backupParent.dataset.index, 1);
+                    backupParent.parentElement.removeChild(backupParent);
+                }).catch((err) => (err) => displayMsg(err));
+                
+                document.body.classList.remove('loading');
+            }
+
             function addRow(btn){
                 let row = `<div class="row">
                                 <div class="move-box">
                                     <div class="move-up" onclick="moveUp(this.parentElement.parentElement)"><i class="arrow up"></i></div>
                                     <div class="move-down" onclick="moveDown(this.parentElement.parentElement)"><i class="arrow down"></i></div>
                                 </div>
-                                <textarea cols="50" rows="2" placeholder="Title" data-type="title"></textarea>
-                                <textarea cols="30" rows="2" type="text" placeholder="Phone" data-type="phone"></textarea>
-                                <textarea cols="30" rows="2" type="text" placeholder="TTY" data-type="tty"></textarea>
-                                <textarea cols="30" rows="2" type="text" placeholder="Website" data-type="website"></textarea>
-                                <textarea cols="50" rows="2" type="text" placeholder="Blurb" data-type="blurb"></textarea>
+                                <textarea rows="2" placeholder="Title" data-type="title"></textarea>
+                                <textarea rows="2" placeholder="Phone" data-type="phone"></textarea>
+                                <textarea rows="2" placeholder="TTY" data-type="tty"></textarea>
+                                <textarea rows="2" placeholder="Website" data-type="website"></textarea>
+                                <textarea rows="2" placeholder="Blurb" data-type="blurb"></textarea>
                                 <div class="delete-row" onclick="deleteRow(this.parentElement)">-</div>
                             </div>`;
 
@@ -175,7 +246,12 @@
 
                 setTimeout(() => {
                     document.body.classList.remove('message');
-                }, 3000);
+                }, 2000);
+            }
+
+            async function reset(){
+                buildMain(resetData);
+                buildBackups();
             }
         </script>
     </body>
