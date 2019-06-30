@@ -23,7 +23,15 @@
             firebase.initializeApp(firebaseConfig);
         </script>
     </head>
-    <body>
+    <body class="loading">
+        <div class="lds">
+            <div class="lds-ellipsis">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
         <div id="main"></div>
         <div id="save" class="btn" onclick="return buildJson()">Save</div>
         <div id="reset" class="btn" onclick="return buildMain()">Reset</div>
@@ -74,9 +82,10 @@
             function buildMain() {
                 let htmlString = '';
                 for(item of mainData) {
-                    htmlString += `<div class="set"><div class="table-title">${item.title}</div>`;
+                    htmlString += `<div class="set"><input type="text" class="table-title" value="${item.title}" placeholder="Section Title" data-type="title"></input>`;
                     for(one of item.data) {
                         htmlString += `<div class="row">
+                                            <textarea cols="40" rows="2">${one.title || ''}</textarea>
                                             <input type="text" value="${one.title || ''}" placeholder="Title" data-type="title"></input>
                                             <input type="text" value="${one.phone || ''}" placeholder="Phone" data-type="phone"></input>
                                             <input type="text" value="${one.tty || ''}" placeholder="TTY" data-type="tty"></input>
@@ -88,6 +97,7 @@
                 }
 
                 main.innerHTML = htmlString;
+                document.body.classList.remove('loading');
             }
 
             function buildJson(){
@@ -103,7 +113,7 @@
                         setData.push(rowItem);
                         rowItem = {}; itemSort++;
                     }
-                    item.title = set.querySelector('.table-title').innerHTML;
+                    item.title = set.querySelector('.table-title').value;
                     item.data = setData;
                     item.sort = setSort;
                     data.push(item);
