@@ -24,7 +24,7 @@
         </script>
     </head>
     <body class="loading">
-        <div class="success">Saved Successfully</div>
+        <div class="user-msg"></div>
         <div class="lds">
             <div class="lds-ellipsis">
                 <div></div>
@@ -78,21 +78,28 @@
                 await backupRef.put(blob).then(function (snapshot) {
                     console.log('Uploaded ' + timestamp);
                 });
-
+                
+                displayMsg('Saved Successfully!');
                 document.body.classList.remove('loading');
             }
 
             function buildMain() {
                 let htmlString = '';
                 for(item of mainData) {
-                    htmlString += `<div class="set"><textarea cols="30" rows="1" type="text" class="table-title" placeholder="Section Title" data-type="title" style="resize:none;">${item.title}</textarea>`;
+                    htmlString += `<div class="set"><textarea cols="30" rows="1" type="text" class="table-title" placeholder="Section Title" data-type="title" style="resize:none;">${item.title}</textarea>
+                                    <div class="add-row" onclick="addRow(this)">+</div>`;
                     for(one of item.data) {
                         htmlString += `<div class="row">
+                                            <div class="move-box">
+                                                <div class="move-up" onclick="moveUp(this.parentElement.parentElement)"><i class="arrow up"></i></div>
+                                                <div class="move-down" onclick="moveDown(this.parentElement.parentElement)"><i class="arrow down"></i></div>
+                                            </div>
                                             <textarea cols="50" rows="2" placeholder="Title" data-type="title">${one.title || ''}</textarea>
                                             <textarea cols="30" rows="2" type="text" placeholder="Phone" data-type="phone">${one.phone || ''}</textarea>
                                             <textarea cols="30" rows="2" type="text" placeholder="TTY" data-type="tty">${one.tty || ''}</textarea>
                                             <textarea cols="30" rows="2" type="text" placeholder="Website" data-type="website">${one.website || ''}</textarea>
                                             <textarea cols="50" rows="2" type="text" placeholder="Blurb" data-type="blurb">${one.blurb || ''}</textarea>
+                                            <div class="delete-row" onclick="deleteRow(this.parentElement)">-</div>
                                         </div>`;
                     }
                     htmlString += `</div>`;
@@ -129,6 +136,46 @@
                 console.log('BUILT DATA:',data);
                 mainData = data;
                 updateStorage();
+            }
+
+            function addRow(btn){
+                let row = `<div class="row">
+                                <div class="move-box">
+                                    <div class="move-up" onclick="moveUp(this.parentElement.parentElement)"><i class="arrow up"></i></div>
+                                    <div class="move-down" onclick="moveDown(this.parentElement.parentElement)"><i class="arrow down"></i></div>
+                                </div>
+                                <textarea cols="50" rows="2" placeholder="Title" data-type="title"></textarea>
+                                <textarea cols="30" rows="2" type="text" placeholder="Phone" data-type="phone"></textarea>
+                                <textarea cols="30" rows="2" type="text" placeholder="TTY" data-type="tty"></textarea>
+                                <textarea cols="30" rows="2" type="text" placeholder="Website" data-type="website"></textarea>
+                                <textarea cols="50" rows="2" type="text" placeholder="Blurb" data-type="blurb"></textarea>
+                                <div class="delete-row" onclick="deleteRow(this.parentElement)">-</div>
+                            </div>`;
+
+                btn.insertAdjacentHTML('afterend', row);
+            }
+
+            function deleteRow(row){
+                row.parentNode.removeChild(row);
+            }
+
+            function moveUp(mainRow){
+                if(mainRow.previousSibling.classList.contains('row'))
+                    mainRow.parentElement.insertBefore(mainRow, mainRow.previousSibling);
+            }
+
+            function moveDown(mainRow){
+                if(mainRow.nextSibling)
+                    mainRow.parentElement.insertBefore(mainRow, mainRow.nextSibling.nextSibling);
+            }
+
+            function displayMsg(msg){
+                document.querySelector('.user-msg').innerHTML = msg;
+                document.body.classList.add('message');
+
+                setTimeout(() => {
+                    document.body.classList.remove('message');
+                }, 3000);
             }
         </script>
     </body>
