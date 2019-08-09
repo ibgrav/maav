@@ -42,7 +42,6 @@ class _MyAppState extends State<MyApp> {
       appBar: AppBar(
         title: Text('Melrose Alliance Against Violence'),
       ),
-      drawer: Drawer(child: mainDrawer()),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -61,36 +60,6 @@ class _MyAppState extends State<MyApp> {
       body: _widgetOptions.elementAt(_selectedIndex),
     );
   }
-}
-
-Drawer mainDrawer() {
-  return Drawer(
-    child: ListView(
-      padding: EdgeInsets.zero,
-      children: <Widget>[
-        DrawerHeader(
-          child: Text('Drawer Header'),
-          decoration: BoxDecoration(
-            color: Colors.amber,
-          ),
-        ),
-        ListTile(
-          title: Text('Item 1'),
-          onTap: () {
-            // Update the state of the app.
-            // ...
-          },
-        ),
-        ListTile(
-          title: Text('Item 2'),
-          onTap: () {
-            // Update the state of the app.
-            // ...
-          },
-        ),
-      ],
-    ),
-  );
 }
 
 ListView maavPage() {
