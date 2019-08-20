@@ -12,6 +12,8 @@ dependencies:
 
   cupertino_icons: ^0.1.2
   url_launcher: ^5.1.2
+  path_provider: ^1.2.0
+  dio: ^2.1.13
 
 dev_dependencies:
   flutter_test:
