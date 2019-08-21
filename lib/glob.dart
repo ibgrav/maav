@@ -9,8 +9,14 @@ import 'package:flutter/material.dart';
 
 import './main.dart' as main;
 
+String ref = "";
 String masterURL = 'https://maav.cdn.prismic.io/api/v1/documents/search';
-List resourceInfo = [];
+String itemsParams =
+    '&q=[[at(document.type,"item")]]&orderings=[my.item.order]';
+String categoriesParams =
+    '&q=[[at(document.type,"category")]]&orderings=[my.category.order]';
+Map resourceInfo = {};
+Map catInfo = {};
 
 getHttp(url) async {
   print('GET - ' + url);
@@ -29,67 +35,95 @@ getHttp(url) async {
 getRef() async {
   var data = await getHttp('https://maav.prismic.io/api/v2');
   var returnData = 'err';
-  if(data != 'err'){
+  if (data != 'err') {
     var json = jsonDecode(data);
-    for(var ref in json["refs"]){
-      if(ref["id"] == "master") returnData = ref["ref"];
+    for (var ref in json["refs"]) {
+      if (ref["id"] == "master") returnData = ref["ref"];
     }
   }
   return returnData;
 }
 
-buildCatData() async {
-  var ref = await getRef();
-  var newData = {};
-  if(ref != 'err'){
-    var data = await getHttp(masterURL + '?ref=' + ref);
-    if(data != 'err'){
-      var json = jsonDecode(data);
-      for(var item in json["results"]){
-        print(item["data"]["item"]);
-        try {
-          newData["title"] = item["data"]["item"]["title"]["value"][0]["text"];
-        } catch(e) {
-          print(e);
-          newData["title"] = "";
-        }
-        try {
-          newData["category"] = item["data"]["item"]["category"]["value"];
-        } catch(e) {
-          print(e);
-          newData["category"] = "";
-        }
-        try {
-          newData["phone"] = item["data"]["item"]["phone"]["value"];
-        } catch(e) {
-          print(e);
-          newData["phone"] = "";
-        }
-        try {
-          newData["tty"] = item["data"]["item"]["tty"]["value"];
-        } catch(e) {
-          print(e);
-          newData["tty"] = "";
-        }
-        try {
-          newData["website"] = item["data"]["item"]["website"]["value"]["url"];
-        } catch(e) {
-          print(e);
-          newData["website"] = "";
-        }
-        try {
-          newData["blurb"] = item["data"]["item"]["blurb"]["value"][0]["text"];
-        } catch(e) {
-          print(e);
-          newData["blurb"] = "";
-        }
+buildCategories(String nextPage) async {
+  String getUrl = masterURL;
 
-        resourceInfo.add(newData);
-        newData = {};
+  if (nextPage != '')
+    getUrl = nextPage;
+  else
+    getUrl += '?ref=' + ref + categoriesParams;
+
+  var data = await getHttp(getUrl);
+  if (data != 'err') {
+    var json = jsonDecode(data);
+    for (var cat in json["results"]) {
+      try {
+        resourceInfo[cat["data"]["category"]["title"]["value"]] = [];
+        catInfo[cat["id"]] = {};
+        catInfo[cat["id"]]["title"] = cat["data"]["category"]["title"]["value"];
+        catInfo[cat["id"]]["color"] = cat["data"]["category"]["color"]["value"];
+      } catch (e) {
+        print(e);
       }
     }
   }
-  print(resourceInfo);
+}
+
+buildItems(String nextPage) async {
+  var newData = {};
+  String getUrl = masterURL;
+
+  if (nextPage != '')
+    getUrl = nextPage;
+  else
+    getUrl += '?ref=' + ref + itemsParams;
+
+  var data = await getHttp(getUrl);
+  if (data != 'err') {
+    var json = jsonDecode(data);
+    for (var item in json["results"]) {
+      try {
+        newData["title"] = item["data"]["item"]["title"]["value"];
+      } catch (e) {
+        newData["title"] = "";
+      }
+      try {
+        newData["category"] = catInfo[item["data"]["item"]["cat"]["value"]["document"]["id"]]["title"];
+        newData["catID"] = item["data"]["item"]["cat"]["value"]["document"]["id"];
+      } catch (e) {
+        newData["category"] = "";
+      }
+      try {
+        newData["phone"] = item["data"]["item"]["phone"]["value"];
+      } catch (e) {
+        newData["phone"] = "";
+      }
+      try {
+        newData["tty"] = item["data"]["item"]["tty"]["value"];
+      } catch (e) {
+        newData["tty"] = "";
+      }
+      try {
+        newData["website"] = item["data"]["item"]["website"]["value"]["url"];
+      } catch (e) {
+        newData["website"] = "";
+      }
+      try {
+        newData["blurb"] = item["data"]["item"]["blurb"]["value"];
+      } catch (e) {
+        newData["blurb"] = "";
+      }
+
+      if (newData["category"] != "") {
+        resourceInfo[newData["category"]].add(newData);
+      }
+
+      newData = {};
+    }
+
+    if (json["next_page"] != null) {
+      await buildItems(json["next_page"]);
+    }
+  }
 }
 
 read(filename, old) async {
@@ -140,4 +174,17 @@ launchMap() async {
 }
 
 TextStyle headerStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
-TextStyle paragraphStyle = TextStyle(fontSize: 15, fontWeight: FontWeight.normal);
+TextStyle paragraphStyle =
+    TextStyle(fontSize: 15, fontWeight: FontWeight.normal);
+
+class HexColor extends Color {
+  static int _getColorFromHex(String hexColor) {
+    hexColor = hexColor.toUpperCase().replaceAll("#", "");
+    if (hexColor.length == 6) {
+      hexColor = "FF" + hexColor;
+    }
+    return int.parse(hexColor, radix: 16);
+  }
+
+  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
+}
