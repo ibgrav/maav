@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import './glob.dart' as glob;
 
@@ -54,23 +55,32 @@ class _ResourcePageState extends State<ResourcePage> {
     Color bgColor;
     List<Widget> listItems = [
       Padding(
-        padding: EdgeInsets.fromLTRB(10, 15, 10, 20),
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(width: 4.0, color: Color(0xFFFF000000)),
-            ),
-          ),
-          child: Center(
-            child: Padding(
-              padding: EdgeInsets.only(bottom: 10),
-              child: Text('Resources',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+        padding: EdgeInsets.fromLTRB(3, 5, 3, 5),
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 10),
+            child: Column(
+              children: [
+                Text(
+                  'Resources',
+                  style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: glob.darkFont),
+                ),
+                SizedBox(height: 10),
+                Container(
+                  height: 5,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4.0),
+                      color: glob.darkFont),
+                )
+              ],
             ),
           ),
         ),
-      )
+      ),
     ];
 
     glob.resourceInfo.forEach((k, v) {
@@ -78,11 +88,19 @@ class _ResourcePageState extends State<ResourcePage> {
         coloredBox.add(Padding(
           padding: EdgeInsets.fromLTRB(0, 5, 0, 10),
           child: Text(k,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal)),
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: glob.darkFont)),
         ));
 
         for (var i in glob.resourceInfo[k]) {
-          coloredBox.add(ResourceItem(title: i["title"], blurb: i["blurb"]));
+          coloredBox.add(ResourceItem(
+              title: i["title"],
+              blurb: i["blurb"],
+              phone: i["phone"],
+              tty: i["tty"],
+              website: i["website"]));
         }
 
         try {
@@ -94,14 +112,14 @@ class _ResourcePageState extends State<ResourcePage> {
 
         listItems.add(
           Padding(
-            padding: EdgeInsets.fromLTRB(5, 10, 5, 20),
+            padding: EdgeInsets.fromLTRB(3, 5, 3, 15),
             child: DecoratedBox(
               decoration: BoxDecoration(
                 boxShadow: [
                   new BoxShadow(
                     color: Color(0x88888888),
                     offset: new Offset(0.0, 0.0),
-                    blurRadius: 3.0,
+                    blurRadius: 2.0,
                   )
                 ],
                 gradient: LinearGradient(
@@ -124,68 +142,178 @@ class _ResourcePageState extends State<ResourcePage> {
       coloredBox = [];
     });
 
+    //for bottom screen padding
+    listItems.add(SizedBox(height: 60));
+
     return ListView(
-        shrinkWrap: true, padding: EdgeInsets.all(15.0), children: listItems);
+        shrinkWrap: true, padding: EdgeInsets.all(10.0), children: listItems);
   }
 }
 
 class ResourceItem extends StatefulWidget {
-  ResourceItem({Key key, this.title, this.blurb}) : super(key: key);
+  ResourceItem(
+      {Key key, this.title, this.blurb, this.phone, this.tty, this.website})
+      : super(key: key);
   final String title;
   final String blurb;
+  final String phone;
+  final String tty;
+  final String website;
 
   @override
   _ResourceItemState createState() => _ResourceItemState();
 }
 
 class _ResourceItemState extends State<ResourceItem> {
-  double height = 60;
+  double maxHeight = 60;
+  bool open = false;
+  BoxConstraints constraints = BoxConstraints();
   bool vis = true;
   MainAxisAlignment columnSpacing = MainAxisAlignment.spaceEvenly;
-  List<Widget> contents = [];
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> contents = [
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          widget.title,
+          style: TextStyle(fontSize: 18, color: glob.darkFont),
+        ),
+      ),
+    ];
+
+    if (widget.blurb != '') {
+      contents.add(SizedBox(height: 5));
+      contents.add(Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          widget.blurb,
+          style: TextStyle(fontSize: 13, color: glob.darkFont),
+        ),
+      ));
+    }
+
+    if (widget.phone != '') {
+      contents.add(SizedBox(height: 5));
+      contents.add(Align(
+        alignment: Alignment.centerLeft,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Phone: ',
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: glob.darkFont),
+            ),
+            GestureDetector(
+              onTap: () async {
+                await glob.launchURL('tel://' +
+                    widget.phone.replaceAll(RegExp('[^a-zA-Z0-9]'), ''));
+              },
+              child: Text(
+                widget.phone,
+                style: TextStyle(fontSize: 15, color: glob.linkFont),
+              ),
+            ),
+          ],
+        ),
+      ));
+    }
+
+    if (widget.tty != '') {
+      contents.add(SizedBox(height: 5));
+      contents.add(Align(
+        alignment: Alignment.centerLeft,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'TTY: ',
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: glob.darkFont),
+            ),
+            GestureDetector(
+              onTap: () async {
+                await glob.launchURL('sms://' +
+                    widget.tty.replaceAll(RegExp('[^a-zA-Z0-9]'), ''));
+              },
+              child: Text(
+                widget.tty,
+                style: TextStyle(fontSize: 15, color: glob.linkFont),
+              ),
+            ),
+          ],
+        ),
+      ));
+    }
+
+    if (widget.website != '') {
+      contents.add(SizedBox(height: 5));
+      contents.add(Align(
+        alignment: Alignment.centerLeft,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Website: ',
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: glob.darkFont),
+            ),
+            GestureDetector(
+              onTap: () async {
+                await glob.launchURL(widget.website);
+              },
+              child: Text(
+                widget.website.replaceAll('https://', '').replaceAll('http://', '').replaceAll('www.', ''),
+                style: TextStyle(fontSize: 15, color: glob.linkFont),
+              ),
+            ),
+          ],
+        ),
+      ));
+    }
+
     return Padding(
-      padding: EdgeInsets.all(5),
+      padding: EdgeInsets.all(3),
       child: GestureDetector(
         onTap: () {
           setState(() {
-            if(height == 200) {
-              height = 60;
-              new Timer.periodic(Duration(milliseconds: 300), (Timer t) => columnSpacing = MainAxisAlignment.spaceEvenly);
-             } else {
-               columnSpacing = MainAxisAlignment.start;
-               height = 200;
-              //  new Timer.periodic(Duration(milliseconds: 300), (Timer t) => );
-             }
+            open = !open;
+
+            // if (open) {
+            //   constraints = BoxConstraints(minHeight: 400);
+            // } else {
+            //   constraints = BoxConstraints();
+            // }
           });
         },
         child: AnimatedContainer(
-          duration: Duration(milliseconds: 300),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5.0),
+            color: Color(0xffffffff),
+            boxShadow: [
+              new BoxShadow(
+                color: Color(0x88888888),
+                offset: new Offset(0.0, 0.0),
+                blurRadius: 2.0,
+              )
+            ],
+          ),
+          duration: Duration(milliseconds: 100),
           width: double.infinity,
-          height: height,
-          color: Color(0xffffffff),
+          constraints: constraints,
           child: Padding(
             padding: EdgeInsets.all(10),
             child: Column(
               mainAxisAlignment: columnSpacing,
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    widget.title,
-                    style: TextStyle(fontSize: 15),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    widget.blurb,
-                    style: TextStyle(fontSize: 10),
-                  ),
-                ),
-              ],
+              children: contents,
             ),
           ),
         ),

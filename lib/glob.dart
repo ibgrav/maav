@@ -18,6 +18,9 @@ String categoriesParams =
 Map resourceInfo = {};
 Map catInfo = {};
 
+Color darkFont = Color(0xFFFF666666);
+Color linkFont = Color(0xFFFF6666FF);
+
 getHttp(url) async {
   print('GET - ' + url);
   try {
@@ -155,6 +158,7 @@ save(filename, data) async {
 }
 
 launchURL(url) async {
+  print(url);
   if (await canLaunch(url)) {
     await launch(url);
   } else {
