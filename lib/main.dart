@@ -1,40 +1,53 @@
-library maav.main;
-
 import 'package:flutter/material.dart';
+import 'dart:async';
 import './glob.dart' as glob;
 
 void main() async {
   glob.ref = await glob.getRef();
   await glob.buildCategories('');
   await glob.buildItems('');
-
-  runApp(MaterialApp(
-    title: 'MAAV',
-    theme: ThemeData(
-      primarySwatch: Colors.amber,
-    ),
-    home: MyApp(),
-  ));
+  runApp(TabBarDemo());
 }
 
-class MyApp extends StatefulWidget {
-  MyApp({Key key, this.title}) : super(key: key);
+class TabBarDemo extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+            bottom: TabBar(
+              tabs: [
+                Tab(text: 'Help'),
+                Tab(text: 'Quiz'),
+                Tab(text: 'About'),
+              ],
+            ),
+            title: Text('Melrose Alliance Against Violence'),
+          ),
+          body: TabBarView(
+            children: [
+              ResourcePage(title: 'test'),
+              Icon(Icons.directions_transit),
+              Icon(Icons.directions_bike),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ResourcePage extends StatefulWidget {
+  ResourcePage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _MyAppState createState() => _MyAppState();
+  _ResourcePageState createState() => _ResourcePageState();
 }
 
-class _MyAppState extends State<MyApp> {
-  int _selectedIndex = 0;
-  double height = 60;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
+class _ResourcePageState extends State<ResourcePage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> coloredBox = [];
@@ -69,24 +82,7 @@ class _MyAppState extends State<MyApp> {
         ));
 
         for (var i in glob.resourceInfo[k]) {
-          coloredBox.add(Padding(
-              padding: EdgeInsets.all(5),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    height == 200 ? height = 60 : height = 200;
-                  });
-                },
-                child: AnimatedContainer(
-                    duration: Duration(milliseconds: 300),
-                    width: double.infinity,
-                    height: height,
-                    color: Color(0xff14ff65),
-                    child: Padding(
-                        padding: EdgeInsets.all(10),
-                        child: makeItem(context, i["title"], i["blurb"],
-                            showDialogue(context), height))),
-              )));
+          coloredBox.add(ResourceItem(title: i["title"], blurb: i["blurb"]));
         }
 
         try {
@@ -128,163 +124,72 @@ class _MyAppState extends State<MyApp> {
       coloredBox = [];
     });
 
-    List<Widget> _widgetOptions = <Widget>[
-      ListView(
-          shrinkWrap: true, padding: EdgeInsets.all(10.0), children: listItems),
-      maavPage(),
-    ];
-
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Melrose Alliance Against Violence'),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.view_list),
-              title: Text('Resources'),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.info),
-              title: Text('About'),
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: Colors.amber,
-          onTap: _onItemTapped,
-        ),
-        body: _widgetOptions.elementAt(_selectedIndex));
+    return ListView(
+        shrinkWrap: true, padding: EdgeInsets.all(15.0), children: listItems);
   }
 }
 
-ListView maavPage() {
-  return ListView(shrinkWrap: true, padding: EdgeInsets.all(15.0), children: [
-    ClipRRect(
-      borderRadius: new BorderRadius.circular(8.0),
-      child: Image.asset('assets/logo_maav.gif'),
-    ),
-    SizedBox(height: 20),
-    Text('About Us', style: glob.headerStyle),
-    SizedBox(height: 20),
-    Text(
-        'Formed in 1995, the Melrose Alliance Against Violence (MAAV) is a nonprofit community-based organization that focuses on outreach, education and community collaboration in order to raise awareness of the problems of bullying, teen dating and domestic violence. Working closely with the Melrose Police Department and Melrose Public Schools, our Board of Directors includes representatives from the city, police, schools, clergy, hospital, business community, Health Department, students, parents and community members at large.',
-        style: glob.paragraphStyle),
-    SizedBox(height: 20),
-    Text(
-        'Our programs include community awareness activities, outreach and support for victims, training for parents and professionals, and education and prevention programs for youth.',
-        style: glob.paragraphStyle),
-    SizedBox(height: 20),
-    Text(
-        'We hope this web site provides useful information on bullying, teen dating and domestic violence, our programs and services, and critical resources for help. If you are unable to find the information you need, or would like to ask a confidential question, please click on Contact Us. We’ll respond via email as soon as we can.',
-        style: glob.paragraphStyle),
-    SizedBox(height: 20),
-    ClipRRect(
-      borderRadius: new BorderRadius.circular(8.0),
-      child: Image.asset('assets/buttons.jpg'),
-    ),
-    SizedBox(height: 20),
-    Text('Mission', style: glob.headerStyle),
-    SizedBox(height: 20),
-    Text(
-        'The mission of the Melrose Alliance Against Violence is to raise community awareness of domestic and teen dating violence, and to promote programs that work to reduce violence and encourage healthy relationships.',
-        style: glob.paragraphStyle),
-    SizedBox(height: 20),
-    Text(
-        'Our programs include community awareness activities, education and prevention programs in the schools, including bullying prevention, mentoring and peer leadership programs; and information, support, resource and referral services for victims, family members and the community at large.',
-        style: glob.paragraphStyle),
-    SizedBox(height: 20),
-    ClipRRect(
-      borderRadius: new BorderRadius.circular(8.0),
-      child: Image.asset('assets/estate.jpg'),
-    ),
-    SizedBox(height: 20),
-    Text('Contact & Location', style: glob.headerStyle),
-    SizedBox(height: 20),
-    Text(
-        'The MAAV offices are located on the 2nd floor of the historic Beebe Estate at: ',
-        style: glob.paragraphStyle),
-    // RaisedButton(
-    //   onPressed: launchMap,
-    //   child: Text('235 West Foster Street in Melrose, Massachusetts',
-    //       style: glob.paragraphStyle),
-    // ),
-    Text(' Parking is available in the rear lot.', style: glob.paragraphStyle),
-  ]);
-}
-
-Text makeItem(
-    context, String titleText, String subtitleText, dialogue, double height) {
-  // var listTile;
-  // if (subtitleText != '') {
-  //   listTile = ListTile(
-  //     // leading: Icon(cardIcon),
-  //     title: Text(titleText),
-  //     subtitle: Text(subtitleText),
-  //     trailing: Icon(Icons.arrow_forward_ios),
-  //   );
-  // } else {
-  //   listTile = ListTile(
-  //     title: Text(titleText),
-  //     trailing: Icon(Icons.arrow_forward_ios),
-  //   );
-  // }
-
-  return Text(titleText);
-
-  // return Card(
-  //   child: GestureDetector(
-  //     onTap: () {
-  //       showDialog(
-  //         context: context,
-  //         builder: (BuildContext context) {
-  //           return showDialogue(context);
-  //         },
-  //       );
-  //     },
-  //     child: ListTileTheme(
-  //       contentPadding: EdgeInsets.fromLTRB(20, 10, 10, 10),
-  //       dense: false,
-  //       child: listTile,
-  //     ),
-  //   ),
-  // );
-}
-
-class ResourcePage extends StatelessWidget {
+class ResourceItem extends StatefulWidget {
+  ResourceItem({Key key, this.title, this.blurb}) : super(key: key);
   final String title;
-  final String btnTitle;
-  const ResourcePage(this.title, this.btnTitle);
+  final String blurb;
+
+  @override
+  _ResourceItemState createState() => _ResourceItemState();
+}
+
+class _ResourceItemState extends State<ResourceItem> {
+  double height = 60;
+  bool vis = true;
+  MainAxisAlignment columnSpacing = MainAxisAlignment.spaceEvenly;
+  List<Widget> contents = [];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: Center(
-        child: RaisedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text(btnTitle),
+    return Padding(
+      padding: EdgeInsets.all(5),
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            if(height == 200) {
+              height = 60;
+              new Timer.periodic(Duration(milliseconds: 300), (Timer t) => columnSpacing = MainAxisAlignment.spaceEvenly);
+             } else {
+               columnSpacing = MainAxisAlignment.start;
+               height = 200;
+              //  new Timer.periodic(Duration(milliseconds: 300), (Timer t) => );
+             }
+          });
+        },
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          width: double.infinity,
+          height: height,
+          color: Color(0xffffffff),
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: columnSpacing,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    widget.title,
+                    style: TextStyle(fontSize: 15),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    widget.blurb,
+                    style: TextStyle(fontSize: 10),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
-}
-
-AlertDialog showDialogue(BuildContext context) {
-  return AlertDialog(
-    title: new Text("Alert Dialog title"),
-    content: new Text("Alert Dialog body"),
-    actions: <Widget>[
-      // usually buttons at the bottom of the dialog
-      new FlatButton(
-        child: new Text("Close"),
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-      ),
-    ],
-  );
 }
