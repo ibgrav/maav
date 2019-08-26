@@ -4,7 +4,7 @@ description: Melrose Alliance Against Violence
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
   flutter:
@@ -14,6 +14,7 @@ dependencies:
   url_launcher: ^5.1.2
   path_provider: ^1.2.0
   dio: ^2.1.13
+  cached_network_image: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -23,7 +24,5 @@ flutter:
   uses-material-design: true
 
   assets:
-   - assets/estate.jpg
-   - assets/buttons.jpg
-   - assets/logo_maav.gif
+   - assets/logo.png
  
