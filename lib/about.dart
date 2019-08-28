@@ -11,10 +11,10 @@ class AboutPage extends StatelessWidget {
 
     for (var i in glob.aboutData) {
       if (i["type"] == "image") {
-        if(i != glob.aboutData[0]) content.add(SizedBox(height: 30));
+        if (i != glob.aboutData[0]) content.add(SizedBox(height: 30));
         content.add(
           ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
+            borderRadius: BorderRadius.circular(3.0),
             child: Image(image: CachedNetworkImageProvider(i["src"])),
           ),
         );
@@ -60,6 +60,6 @@ class AboutPage extends StatelessWidget {
     content.add(SizedBox(height: 60));
 
     return ListView(
-        shrinkWrap: true, padding: EdgeInsets.all(10.0), children: content);
+        shrinkWrap: true, padding: EdgeInsets.all(20.0), children: content);
   }
 }

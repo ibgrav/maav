@@ -68,7 +68,7 @@ class _CategoryState extends State<Category> {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints viewportConstraints) {
       return Padding(
-        padding: EdgeInsets.fromLTRB(3, 5, 3, 15),
+        padding: EdgeInsets.fromLTRB(3, 5, 3, 10),
         child: Container(
           decoration: BoxDecoration(
             boxShadow: [
@@ -78,12 +78,13 @@ class _CategoryState extends State<Category> {
                 blurRadius: 2.0,
               )
             ],
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [widget.bgColor, widget.bgColor],
-              tileMode: TileMode.clamp, // repeats the gradient over the canvas
-            ),
+            color: widget.bgColor,
+            // gradient: LinearGradient(
+            //   begin: Alignment.topCenter,
+            //   end: Alignment.bottomCenter,
+            //   colors: [widget.bgColor, widget.bgColor],
+            //   tileMode: TileMode.clamp,
+            // ),
             borderRadius: BorderRadius.circular(3.0),
           ),
           child: Padding(
@@ -104,7 +105,7 @@ class _CategoryState extends State<Category> {
                     });
                   },
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 7),
                     child: Text(
                       widget.title,
                       style: TextStyle(
@@ -159,7 +160,7 @@ class _ResourceItemState extends State<ResourceItem> {
       Align(
         alignment: Alignment.centerLeft,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+          padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
           child: Text(
             widget.title,
             style: TextStyle(
@@ -169,6 +170,10 @@ class _ResourceItemState extends State<ResourceItem> {
           ),
         ),
       ),
+      Divider(
+        height: 3.0,
+        color: Colors.grey,
+      )
     ];
 
     if (widget.blurb != '') {
@@ -302,7 +307,7 @@ class _ResourceItemState extends State<ResourceItem> {
               new BoxShadow(
                 color: Color(0x88888888),
                 offset: new Offset(0.0, 0.0),
-                blurRadius: 2.0,
+                blurRadius: 5.0,
               )
             ],
           ),
@@ -310,7 +315,7 @@ class _ResourceItemState extends State<ResourceItem> {
           width: double.infinity,
           constraints: constraints,
           child: Padding(
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
             child: Column(
               mainAxisAlignment: columnSpacing,
               children: contents,

@@ -195,8 +195,14 @@ quizCrawl(String data) {
   for (var page in json["pages"]) {
     for (var result in page["results"]) {
       try {
-        newData["title"] = result["data"][newData["type"]]["title"];
-        newData["description"] = result["data"][newData["type"]]["description"];
+        newData["title"] = result["data"][newData["type"]]["title"]["value"];
+        newData["description"] = result["data"][newData["type"]]["description"]["value"];
+      } catch (e) {
+        print(e);
+      }
+
+      try {
+        newData["time"] = result["data"][newData["type"]]["finish_time"]["value"];
       } catch (e) {
         print(e);
       }
