@@ -7,7 +7,7 @@ import './quizes.dart' as quizes;
 void main() async {
   var init = await glob.initializeApp();
   // var init = 'err';
-  if (init != 'err') 
+  if (init != 'err')
     runApp(MyApp());
   else
     runApp(NetworkErr());
@@ -58,7 +58,8 @@ class NetworkErr extends StatelessWidget {
             Padding(
                 padding: EdgeInsets.all(30),
                 child: Text('There was an issue connecting to the internet',
-                    style: TextStyle(color: glob.darkFont, fontSize: 25), textAlign: TextAlign.center)),
+                    style: TextStyle(color: glob.darkFont, fontSize: 25),
+                    textAlign: TextAlign.center)),
             RaisedButton(
               onPressed: () async {
                 var init = await glob.initializeApp();

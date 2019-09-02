@@ -24,7 +24,7 @@ String quizData = "{\"pages\":[";
 List<Map> quizOutput = [];
 String updateTime = "";
 
-Color darkFont = Color(0xFFFF666666);
+Color darkFont = Color(0xFFFF555555);
 Color linkFont = Color(0xFFFF6666FF);
 
 initializeApp() async {

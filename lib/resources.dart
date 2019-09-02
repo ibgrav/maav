@@ -71,18 +71,19 @@ class _CategoryState extends State<Category> {
         padding: EdgeInsets.fromLTRB(3, 5, 3, 10),
         child: Container(
           decoration: BoxDecoration(
+            // border: Border.all(color: widget.bgColor, width: 1),
             boxShadow: [
               new BoxShadow(
-                color: Color(0x88888888),
+                color: widget.bgColor,
                 offset: new Offset(0.0, 0.0),
-                blurRadius: 2.0,
+                blurRadius: 5.0,
               )
             ],
-            color: widget.bgColor,
+            color: Colors.white,
             // gradient: LinearGradient(
             //   begin: Alignment.topCenter,
             //   end: Alignment.bottomCenter,
-            //   colors: [widget.bgColor, widget.bgColor],
+            //   colors: [Color(0xFFFFFFFF), widget.bgColor],
             //   tileMode: TileMode.clamp,
             // ),
             borderRadius: BorderRadius.circular(3.0),
@@ -303,13 +304,13 @@ class _ResourceItemState extends State<ResourceItem> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(3.0),
             color: Color(0xffffffff),
-            boxShadow: [
-              new BoxShadow(
-                color: Color(0x88888888),
-                offset: new Offset(0.0, 0.0),
-                blurRadius: 5.0,
-              )
-            ],
+            // boxShadow: [
+            //   new BoxShadow(
+            //     color: Color(0x88888888),
+            //     offset: new Offset(0.0, 0.0),
+            //     blurRadius: 5.0,
+            //   )
+            // ],
           ),
           duration: Duration(milliseconds: 100),
           width: double.infinity,
